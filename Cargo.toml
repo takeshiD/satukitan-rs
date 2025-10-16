@@ -2,6 +2,11 @@
 name = "satukitan-rs"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+
+[[bin]]
+name = "satukitan"
+path = "src/main.rs"
 
 [dependencies]
 nom = "8.0.0"
