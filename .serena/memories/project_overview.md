@@ -1,0 +1,4 @@
+# Project Overview
+- Purpose: Implement the Satukitan scripting language (Lisp-like syntax) in Rust, providing parsing, evaluation, and execution capabilities for both REPL and file-based usage.
+- Tech Stack: Rust 2024 edition, Cargo-managed crate; currently minimal implementation with `src/main.rs` placeholder.
+- Key Specs: Language design captured in `DESIGN.md`, linguistic notes in `SATUKITAN.md`. Language aims to support numeric/boolean/string literals, list containers, arithmetic/logical comparisons, conditionals, bindings, function definitions (including recursion), and standard output via `sipus`.

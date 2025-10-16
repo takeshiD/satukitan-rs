@@ -1,6 +1,10 @@
 [package]
-name = "satukitan"
+name = "satukitan-rs"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+nom = "8.0.0"
+thiserror = "2.0.17"
+clap = { version = "4.5.49", features = ["derive"] }
+rustyline = "17.0.2"
