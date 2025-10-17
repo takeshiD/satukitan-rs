@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::error::SatukitanError;
-use crate::value::{BuiltinFunction, Value};
+use crate::value::{Arity, BuiltinFunction, Value};
 
 #[derive(Debug)]
 pub struct Environment {
@@ -33,9 +33,13 @@ impl Environment {
     pub fn define_builtin(
         &mut self,
         name: &'static str,
+        arity: Arity,
         func: fn(&[Value]) -> Result<Value, SatukitanError>,
     ) {
-        self.define(name, Value::Builtin(BuiltinFunction::new(name, func)));
+        self.define(
+            name,
+            Value::Builtin(BuiltinFunction::new(name, arity, func)),
+        );
     }
 
     pub fn assign(&mut self, name: &str, value: Value) -> Result<(), SatukitanError> {

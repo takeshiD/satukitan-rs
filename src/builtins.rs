@@ -1,21 +1,21 @@
 use crate::env::Environment;
 use crate::error::SatukitanError;
-use crate::value::Value;
+use crate::value::{Arity, Value};
 
 pub fn install(env: &mut Environment) {
-    env.define_builtin("ritas", builtin_add);
-    env.define_builtin("matyes", builtin_sub);
-    env.define_builtin("nitas", builtin_mul);
-    env.define_builtin("teses", builtin_and);
-    env.define_builtin("kenus", builtin_or);
-    env.define_builtin("ditas", builtin_lt);
-    env.define_builtin("fityes", builtin_gt);
-    env.define_builtin("gatas", builtin_eq);
-    env.define_builtin("ditasgata", builtin_le);
-    env.define_builtin("fityesgata", builtin_ge);
-    env.define_builtin("fanitas", builtin_sort);
-    env.define_builtin("rakas", builtin_length);
-    env.define_builtin("sipus", builtin_print);
+    env.define_builtin("ritas", Arity::AtLeast(2), builtin_add);
+    env.define_builtin("matyes", Arity::AtLeast(2), builtin_sub);
+    env.define_builtin("nitas", Arity::AtLeast(2), builtin_mul);
+    env.define_builtin("teses", Arity::AtLeast(2), builtin_and);
+    env.define_builtin("kenus", Arity::AtLeast(2), builtin_or);
+    env.define_builtin("ditas", Arity::Exact(2), builtin_lt);
+    env.define_builtin("fityes", Arity::Exact(2), builtin_gt);
+    env.define_builtin("gatas", Arity::AtLeast(2), builtin_eq);
+    env.define_builtin("ditasgata", Arity::Exact(2), builtin_le);
+    env.define_builtin("fityesgata", Arity::Exact(2), builtin_ge);
+    env.define_builtin("fanitas", Arity::Exact(1), builtin_sort);
+    env.define_builtin("rakas", Arity::Exact(1), builtin_length);
+    env.define_builtin("sipus", Arity::Any, builtin_print);
 }
 
 fn builtin_add(args: &[Value]) -> Result<Value, SatukitanError> {

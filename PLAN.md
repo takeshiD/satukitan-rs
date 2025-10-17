@@ -57,31 +57,37 @@
 
 ## 実装TODO
 ### フェーズ1: 基盤整備
-- [ ] 依存追加: `nom`, `thiserror`(エラー), `clap`(CLI), `rustyline`(REPLオプション)を`Cargo.toml`に記載。
-- [ ] プロジェクト再構成: `src/lib.rs`作成、モジュール骨格(`ast`, `lexer`, `parser`, `value`, `env`, `builtins`, `evaluator`, `repl`, `cli`)の雛形を配置。
+- [x] 依存追加: `nom`, `thiserror`(エラー), `clap`(CLI), `rustyline`(REPLオプション)を`Cargo.toml`に記載。
+- [x] プロジェクト再構成: `src/lib.rs`作成、モジュール骨格(`ast`, `lexer`, `parser`, `value`, `env`, `builtins`, `evaluator`, `repl`, `cli`)の雛形を配置。
 - [ ] 言語仕様ドキュメント整備: `DESIGN.md`に評価規則/エラーポリシーと、関数定義が`gakasdenu`である点を追記。
+  - `DESIGN.md`に`gakasdenu`のサンプルは追加済み。評価規則・エラーポリシーの記述は未反映。
 
 ### フェーズ2: パーサ実装
-- [ ] 字句解析: `lexer`モジュールでトークン列生成、ユニットテストを作成。
-- [ ] 構文解析: `parser`で式/リスト/特殊形式を`nom`で解析。ネスト対応とエラー復旧方針を実装。
-- [ ] パース検証: `tests/parser.rs`を作成し、主要構文(`ritas`, `nobu`, `gakas`, `gakasdenu`, リスト)を網羅。
+- [x] 字句解析: `lexer`モジュールでトークン列生成、ユニットテストを作成。
+  - `tests/lexer.rs`で識別子・空白ハンドラの挙動を検証済み。
+- [x] 構文解析: `parser`で式/リスト/特殊形式を`nom`で解析。ネスト対応とエラー復旧方針を実装。
+- [x] パース検証: `tests/parser.rs`を作成し、主要構文(`ritas`, `nobu`, `gakas`, `gakasdenu`, リスト)を網羅。
 
 ### フェーズ3: 評価器・環境
-- [ ] `Value`/`Env`定義: 実行時値と環境チェーンを実装し、ディスプレイ用フォーマットを整備。
-- [ ] 特殊形式実装: `nobu`, `gakas`(値束縛), `gakasdenu`(関数束縛)の評価ロジックを追加。`gakasdenu`は非再帰関数でも環境へ自己参照として登録できるようにする。
-- [ ] 組み込み登録: 算術/論理/比較/リスト/`sipus`を`builtins`で実装し、起動時に環境へロード。
-- [ ] エラー処理: `SatukitanError`と`Result`伝播、テストケースで確認。
+- [x] `Value`/`Env`定義: 実行時値と環境チェーンを実装し、ディスプレイ用フォーマットを整備。
+- [x] 特殊形式実装: `nobu`, `gakas`(値束縛), `gakasdenu`(関数束縛)の評価ロジックを追加。`gakasdenu`は非再帰関数でも環境へ自己参照として登録できるようにする。
+- [x] 組み込み登録: 算術/論理/比較/リスト/`sipus`を`builtins`で実装し、起動時に環境へロード。
+  - `Arity`メタデータとインライン適用ロジックを導入し、`sipus matyes ra ru`のような評価順序も保証。
+- [x] エラー処理: `SatukitanError`と`Result`伝播、テストケースで確認。
 
 ### フェーズ4: エントリーポイント
-- [ ] REPL: `repl`モジュールで読み->解析->評価->表示のループ。履歴/終了コマンド(`quit`)検討。
-- [ ] ファイル実行: `.st`拡張子を受け取り、ファイル内容を評価して終了コードを返す。
-- [ ] CLI統合: `clap`で`satukitan run <file>`/`satukitan repl`等のサブコマンドを設計。
+- [x] REPL: `repl`モジュールで読み->解析->評価->表示のループ。履歴/終了コマンド(`quit`)検討。
+  - `rustyline`ヘルパーで予約語サジェストをカラー表示し、注釈(シグネチャ/リテラル)付きで提示。
+- [x] ファイル実行: `.st`拡張子を受け取り、ファイル内容を評価して終了コードを返す。
+- [x] CLI統合: `clap`で`satukitan run <file>`/`satukitan repl`等のサブコマンドを設計。
 
 ### フェーズ5: 品質保証
-- [ ] テスト拡充: 組み込み関数・再帰・条件分岐・非再帰関数(`gakasdenu`)の評価テストを追加。
-- [ ] ドキュメント更新: `README.md`に使用例、REPL操作、ファイル実行例(`sample.st`)を記載。
+- [x] テスト拡充: 組み込み関数・再帰・条件分岐・非再帰関数(`gakasdenu`)の評価テストを追加。
+  - `tests/eval.rs`で束縛・条件・再帰(`fibo`)を網羅し、`tests/side_effects.rs`で副作用の評価順序を確認。
+- [x] ドキュメント更新: `README.md`に使用例、REPL操作、ファイル実行例(`sample.st`)を記載。
 - [ ] 形式検証: `cargo fmt`, `cargo clippy`, `cargo test`をCI想定のローカルコマンドとして整備。
-- [ ] サンプルスクリプト: `examples/`または`sample/`に`hello_world.st`などを配置し、動作確認手順を明示。
+  - READMEにローカル実行手順は記載済み。CI/自動化は未整備。
+- [x] サンプルスクリプト: `examples/`または`sample/`に`hello_world.st`などを配置し、動作確認手順を明示。
 
 ### フェーズ6: 将来拡張メモ
 - [ ] コメント構文(例: `;`以降無視)の導入検討。

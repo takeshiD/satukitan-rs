@@ -4,6 +4,13 @@ use std::rc::Rc;
 
 use crate::{ast::Expr, env::Environment, error::SatukitanError};
 
+#[derive(Clone, Copy, Debug)]
+pub enum Arity {
+    Exact(usize),
+    AtLeast(usize),
+    Any,
+}
+
 #[derive(Clone)]
 pub enum Value {
     Number(i64),
@@ -26,6 +33,7 @@ pub struct FunctionValue {
 pub struct BuiltinFunction {
     pub name: &'static str,
     func: fn(&[Value]) -> Result<Value, SatukitanError>,
+    arity: Arity,
 }
 
 impl FunctionValue {
@@ -35,12 +43,20 @@ impl FunctionValue {
 }
 
 impl BuiltinFunction {
-    pub fn new(name: &'static str, func: fn(&[Value]) -> Result<Value, SatukitanError>) -> Self {
-        Self { name, func }
+    pub fn new(
+        name: &'static str,
+        arity: Arity,
+        func: fn(&[Value]) -> Result<Value, SatukitanError>,
+    ) -> Self {
+        Self { name, func, arity }
     }
 
     pub fn call(&self, args: &[Value]) -> Result<Value, SatukitanError> {
         (self.func)(args)
+    }
+
+    pub fn arity(&self) -> Arity {
+        self.arity
     }
 }
 

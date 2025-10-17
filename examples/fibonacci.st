@@ -8,4 +8,4 @@ gakasdenu fibo (n) (
 )
 
 # Compute fibo(6) = 8 -> ryo
-sipus (fibo ru)
+sipus (fibo rya)

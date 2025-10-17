@@ -4,7 +4,7 @@ use std::rc::Rc;
 use crate::ast::Expr;
 use crate::env::Environment;
 use crate::error::SatukitanError;
-use crate::value::{FunctionValue, Value};
+use crate::value::{Arity, FunctionValue, Value};
 
 pub fn eval_program(
     program: &[Expr],
@@ -33,7 +33,7 @@ pub fn eval_expr(expr: &Expr, env: Rc<RefCell<Environment>>) -> Result<Value, Sa
             }
             Ok(Value::List(values))
         }
-        Expr::List(items) => eval_list(items, env),
+        Expr::List(items) => eval_list(items, env.clone()),
         Expr::Call { func, args } => eval_call(func, args, env),
     }
 }
@@ -78,6 +78,14 @@ fn eval_symbolic_application(
                 .borrow()
                 .get(name)
                 .ok_or_else(|| SatukitanError::UndefinedSymbol(name.to_string()))?;
+
+            if args.is_empty() {
+                return match callable {
+                    Value::Function(_) | Value::Builtin(_) => apply_callable(callable, Vec::new()),
+                    other => Ok(other),
+                };
+            }
+
             let evaluated_args = eval_arguments(args, env)?;
             apply_callable(callable, evaluated_args)
         }
@@ -209,10 +217,45 @@ fn eval_arguments(
     env: Rc<RefCell<Environment>>,
 ) -> Result<Vec<Value>, SatukitanError> {
     let mut values = Vec::with_capacity(args.len());
-    for expr in args {
-        values.push(eval_expr(expr, env.clone())?);
+    let mut index = 0;
+    while index < args.len() {
+        let value = eval_expr(&args[index], env.clone())?;
+        if let Some((result, consumed)) =
+            auto_apply_if_callable(&value, &args[index + 1..], env.clone())?
+        {
+            values.push(result);
+            index += 1 + consumed;
+        } else {
+            values.push(value);
+            index += 1;
+        }
     }
     Ok(values)
+}
+
+fn auto_apply_if_callable(
+    value: &Value,
+    remaining: &[Expr],
+    env: Rc<RefCell<Environment>>,
+) -> Result<Option<(Value, usize)>, SatukitanError> {
+    if let Value::Builtin(builtin) = value {
+        let required = match builtin.arity() {
+            Arity::Exact(n) => n,
+            Arity::AtLeast(n) => n,
+            Arity::Any => 0,
+        };
+        if required == 0 || remaining.len() < required {
+            return Ok(None);
+        }
+        let mut collected = Vec::with_capacity(required);
+        for expr in &remaining[..required] {
+            collected.push(eval_expr(expr, env.clone())?);
+        }
+        let result = builtin.call(&collected)?;
+        Ok(Some((result, required)))
+    } else {
+        Ok(None)
+    }
 }
 
 fn apply_callable(func: Value, args: Vec<Value>) -> Result<Value, SatukitanError> {

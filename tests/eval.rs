@@ -59,3 +59,20 @@ fn conditional_branches() {
         .expect("nobu should evaluate false branch");
     assert!(matches!(result_false, Value::Number(1)));
 }
+
+#[test]
+fn recursive_function_fibonacci() {
+    let mut interpreter = Interpreter::new();
+    let source = r#"
+        gakasdenu fibo (n) (
+            nobu (ditasgata n ru)
+                (n)
+                (ritas (fibo (matyes n ru)) (fibo (matyes n ra)))
+        )
+        fibo rya
+    "#;
+    let result = interpreter
+        .eval_str(source)
+        .expect("recursive function should evaluate");
+    assert!(matches!(result, Value::Number(8)));
+}
