@@ -50,14 +50,14 @@ fn validate_extension(path: &Path) -> Result<(), SatukitanError> {
     let is_valid = path
         .file_name()
         .and_then(|name| name.to_str())
-        .map(|name| name.ends_with(".sample.st"))
+        .map(|name| name.ends_with(".st"))
         .unwrap_or(false);
 
     if is_valid {
         Ok(())
     } else {
         Err(SatukitanError::Eval(format!(
-            "expected a .sample.st file, got {}",
+            "expected a .st file, got {}",
             path.display()
         )))
     }
